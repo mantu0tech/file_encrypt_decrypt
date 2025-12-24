@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Encryption & Decryption</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            display: flex;
+            max-width: 1200px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            border-radius: 30px;
+            overflow: hidden;
+        }
+
+        .panel {
+            flex: 1;
+            padding: 50px;
+        }
+
+        .encrypt-panel {
+            background: white;
+        }
+
+        .decrypt-panel {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+        }
+
+        .panel-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .panel-header svg {
+            width: 40px;
+            height: 40px;
+        }
+
+        .encrypt-panel .panel-header svg {
+            stroke: #374151;
+        }
+
+        .decrypt-panel .panel-header svg {
+            stroke: white;
+        }
+
+        h1 {
+            font-size: 36px;
+            font-weight: bold;
+        }
+
+        .subtitle {
+            font-size: 20px;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        input {
+            width: 100%;
+            padding: 16px;
+            border: 2px solid #d1d5db;
+            border-radius: 12px;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .encrypt-panel input {
+            background: white;
+            color: #374151;
+        }
+
+        .encrypt-panel input:focus {
+            border-color: #9333ea;
+        }
+
+        .decrypt-panel input {
+            background: transparent;
+            color: white;
+            border-color: white;
+        }
+
+        .decrypt-panel input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .decrypt-panel input:focus {
+            border-color: white;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .toggle-password svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .encrypt-panel .toggle-password svg {
+            stroke: #6b7280;
+        }
+
+        .decrypt-panel .toggle-password svg {
+            stroke: white;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-bottom: 15px;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #9333ea 0%, #7e22ce 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(147, 51, 234, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(147, 51, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #2563eb;
+            border: 2px solid white;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: white;
+            border: 2px solid white;
+        }
+
+        .btn-outline:hover {
+            background: white;
+            color: #2563eb;
+        }
+
+        .status {
+            text-align: center;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-weight: 600;
+        }
+
+        .encrypt-panel .status {
+            background: rgba(147, 51, 234, 0.1);
+            color: #7e22ce;
+        }
+
+        .decrypt-panel .status {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Encrypt Panel -->
+        <div class="panel encrypt-panel">
+            <div class="panel-header">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                </svg>
+                <h1>Encrypt Files</h1>
+            </div>
+
+            <div class="input-group">
+                <input type="password" id="encryptKey" placeholder="Key">
+                <button class="toggle-password" onclick="togglePassword('encryptKey')">
+                    <svg id="encryptEyeIcon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                        <circle cx="12" cy="12" r="3"/>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="input-group">
+                <input type="password" id="encryptIterations" placeholder="PBKDF2 Iterations" value="100000">
+                <button class="toggle-password" onclick="togglePassword('encryptIterations')">
+                    <svg id="encryptIterEyeIcon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                        <circle cx="12" cy="12" r="3"/>
+                    </svg>
+                </button>
+            </div>
+
+            <input type="file" id="encryptFileInput" multiple>
+            <button class="btn btn-primary" onclick="document.getElementById('encryptFileInput').click()">
+                SELECT FILES
+            </button>
+
+            <button class="btn btn-primary" onclick="generateRandomValues()">
+                GENERATE RANDOM VALUES
+            </button>
+
+            <button class="btn btn-primary" onclick="viewEncryptFiles()">
+                VIEW SELECTED FILES
+            </button>
+
+            <button class="btn btn-primary" onclick="encryptFiles()">
+                ENCRYPT FILES
+            </button>
+
+            <div id="encryptStatus" class="status hidden"></div>
+        </div>
+
+        <!-- Decrypt Panel -->
+        <div class="panel decrypt-panel">
+            <div class="panel-header">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                    <path d="M7 11V7a5 5 0 0 1 9.9-1"/>
+                </svg>
+                <h1>Decrypt Files</h1>
+            </div>
+
+            <p class="subtitle">Decrypt your files with AES-256 CBC</p>
+
+            <div class="input-group">
+                <input type="password" id="decryptKey" placeholder="Key">
+                <button class="toggle-password" onclick="togglePassword('decryptKey')">
+                    <svg id="decryptEyeIcon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                        <circle cx="12" cy="12" r="3"/>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="input-group">
+                <input type="password" id="decryptIterations" placeholder="PBKDF2 Iterations" value="100000">
+                <button class="toggle-password" onclick="togglePassword('decryptIterations')">
+                    <svg id="decryptIterEyeIcon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                        <circle cx="12" cy="12" r="3"/>
+                    </svg>
+                </button>
+            </div>
+
+            <input type="file" id="decryptFileInput" multiple>
+            <button class="btn btn-secondary" onclick="document.getElementById('decryptFileInput').click()">
+                SELECT FILES
+            </button>
+
+            <button class="btn btn-outline" onclick="viewDecryptFiles()">
+                VIEW SELECTED FILES
+            </button>
+
+            <button class="btn btn-outline" onclick="decryptFiles()">
+                DECRYPT
+            </button>
+
+            <div id="decryptStatus" class="status hidden"></div>
+        </div>
+    </div>
+
+    <script>
+        let encryptSelectedFiles = [];
+        let decryptSelectedFiles = [];
+
+        document.getElementById('encryptFileInput').addEventListener('change', function(e) {
+            encryptSelectedFiles = Array.from(e.target.files);
+            showStatus('encryptStatus', `${encryptSelectedFiles.length} file(s) selected`);
+        });
+
+        document.getElementById('decryptFileInput').addEventListener('change', function(e) {
+            decryptSelectedFiles = Array.from(e.target.files);
+            showStatus('decryptStatus', `${decryptSelectedFiles.length} file(s) selected`);
+        });
+
+        function togglePassword(inputId) {
+            const input = document.getElementById(inputId);
+            if (input.type === 'password') {
+                input.type = 'text';
+            } else {
+                input.type = 'password';
+            }
+        }
+
+        function generateRandomValues() {
+            const array = new Uint8Array(32);
+            crypto.getRandomValues(array);
+            const randomKey = Array.from(array).map(b => b.toString(16).padStart(2, '0')).join('');
+            const randomIterations = Math.floor(Math.random() * 900000) + 100000;
+            
+            document.getElementById('encryptKey').value = randomKey;
+            document.getElementById('encryptIterations').value = randomIterations;
+            showStatus('encryptStatus', 'Random values generated!');
+        }
+
+        function viewEncryptFiles() {
+            if (encryptSelectedFiles.length === 0) {
+                alert('No files selected');
+                return;
+            }
+            const fileList = encryptSelectedFiles.map(f => 
+                `${f.name} (${(f.size / 1024).toFixed(2)} KB)`
+            ).join('\n');
+            alert(`Selected Files:\n\n${fileList}`);
+        }
+
+        function viewDecryptFiles() {
+            if (decryptSelectedFiles.length === 0) {
+                alert('No files selected');
+                return;
+            }
+            const fileList = decryptSelectedFiles.map(f => 
+                `${f.name} (${(f.size / 1024).toFixed(2)} KB)`
+            ).join('\n');
+            alert(`Selected Files:\n\n${fileList}`);
+        }
+
+       
+        function encryptFiles() {
+    const key = document.getElementById('encryptKey').value;
+    const fileInput = document.getElementById('encryptFileInput');
+
+    if (!fileInput.files.length) {
+        showStatus('encryptStatus', 'Please select a file');
+        return;
+    }
+    if (!key) {
+        showStatus('encryptStatus', 'Please enter an encryption key');
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", fileInput.files[0]);
+    formData.append("key", key);
+
+    showStatus('encryptStatus', 'Encrypting...');
+
+    fetch("/encrypt", {
+        method: "POST",
+        body: formData
+    })
+    .then(response => {
+        if (!response.ok) throw new Error("Encryption failed");
+        return response.blob();
+    })
+    .then(blob => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = fileInput.files[0].name + ".enc";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        showStatus('encryptStatus', 'File encrypted & downloaded!');
+    })
+    .catch(err => {
+        showStatus('encryptStatus', err.message);
+    });
+}
+
+  
+function decryptFiles() {
+    const key = document.getElementById('decryptKey').value;
+    const fileInput = document.getElementById('decryptFileInput');
+
+    if (!fileInput.files.length) {
+        showStatus('decryptStatus', 'Please select a file');
+        return;
+    }
+    if (!key) {
+        showStatus('decryptStatus', 'Please enter a decryption key');
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", fileInput.files[0]);
+    formData.append("key", key);
+
+    showStatus('decryptStatus', 'Decrypting...');
+
+    fetch("/decrypt", {
+        method: "POST",
+        body: formData
+    })
+    .then(response => {
+        if (!response.ok) throw new Error("Decryption failed");
+        return response.blob();
+    })
+    .then(blob => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = fileInput.files[0].name.replace(".enc", "");
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        showStatus('decryptStatus', 'File decrypted & downloaded!');
+    })
+    .catch(err => {
+        showStatus('decryptStatus', err.message);
+    });
+}
+
+        function showStatus(elementId, message) {
+            const statusElement = document.getElementById(elementId);
+            statusElement.textContent = message;
+            statusElement.classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>

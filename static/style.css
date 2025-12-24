@@ -1,0 +1,100 @@
+body {
+    margin: 0;
+    background: #4c52d9;
+    font-family: "Segoe UI", Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+/* Outer wrapper */
+.wrapper {
+    width: 900px;
+    max-width: 95%;
+}
+
+/* Main card */
+.card {
+    display: flex;
+    border-radius: 18px;
+    overflow: hidden;
+    background: white;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.25);
+}
+
+/* LEFT PANEL */
+.left-panel {
+    flex: 1;
+    padding: 60px 40px;
+    color: white;
+    background: linear-gradient(to right, #203a86, #367fd6);
+    text-align: center;
+}
+
+.left-panel h2 {
+    font-size: 2rem;
+    margin-bottom: 15px;
+}
+
+.left-panel p {
+    margin-bottom: 40px;
+    opacity: 0.9;
+}
+
+/* RIGHT PANEL */
+.right-panel {
+    flex: 1;
+    padding: 60px 40px;
+    background: white;
+    text-align: center;
+}
+
+.right-panel h2 {
+    margin-bottom: 25px;
+    color: #333;
+}
+
+/* INPUTS */
+.file-input {
+    margin: 15px 0 25px;
+    padding: 12px;
+    width: 80%;
+    background: #f3f3f7;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+}
+
+/* Buttons */
+.primary-btn,
+.outline-btn {
+    width: 80%;
+    padding: 13px;
+    font-size: 1rem;
+    border-radius: 25px;
+    margin-bottom: 15px;
+    cursor: pointer;
+    border: none;
+    transition: 0.2s ease;
+}
+
+/* Purple Buttons */
+.primary-btn {
+    background: #7d3df0;
+    color: white;
+}
+
+.primary-btn:hover {
+    background: #652bcc;
+}
+
+/* White Outline Button on Left */
+.outline-btn {
+    background: transparent;
+    border: 2px solid white;
+    color: white;
+}
+
+.outline-btn:hover {
+    background: rgba(255,255,255,0.15);
+}
