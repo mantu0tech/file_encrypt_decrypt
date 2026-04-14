@@ -134,8 +134,8 @@ pipeline {
       }
     }
 
-    // ✅ LOCAL DEPLOYMENT (Jenkins Server)
-    stage('Deploy Locally') {
+    //  DEPLOYMENT (Jenkins Server)
+    stage('Deploy on Server') {
       steps {
         sh """
           echo "Stopping old container if exists..."
@@ -147,7 +147,7 @@ pipeline {
             --name my-app \
             --network monitoring || true \
             --restart unless-stopped \
-            -p 3000:3000 \
+            -p 5000:5000 \
             ${LATEST_IMAGE}
 
           echo "Deployment complete"
