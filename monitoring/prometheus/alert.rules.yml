@@ -1,0 +1,61 @@
+groups:
+  - name: app_alerts
+    rules:
+
+      # Alert if the Flask container stops running
+      - alert: FlaskContainerDown
+        expr: >
+          absent(container_last_seen{name="my-app"}) == 1
+          or
+          container_last_seen{name="my-app"} < time() - 60
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Flask app container is DOWN"
+          description: "The my-app container has stopped or disappeared"
+
+      # Alert if Nginx is getting 5xx errors
+      - alert: HighErrorRate
+        expr: >
+          rate(nginx_http_requests_total{status=~"5.."}[5m]) > 0.05
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High 5xx error rate"
+          description: "More than 5% of requests returning 5xx errors"
+
+      # Alert if Flask container memory is above 500MB
+      - alert: HighMemoryUsage
+        expr: >
+          container_memory_usage_bytes{name="my-app"} / 1024 / 1024 > 500
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Flask container using too much memory"
+          description: "Memory above 500MB for over 5 minutes"
+
+      # Alert if Flask container CPU is above 80%
+      - alert: HighCPUUsage
+        expr: >
+          rate(container_cpu_usage_seconds_total{name="my-app"}[5m]) * 100 > 80
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Flask container high CPU usage"
+          description: "Container CPU above 80% for 5 minutes"
+
+      # Alert if EC2 disk is above 85% full
+      - alert: DiskAlmostFull
+        expr: >
+          (node_filesystem_avail_bytes{mountpoint="/"} /
+           node_filesystem_size_bytes{mountpoint="/"}) * 100 < 15
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "EC2 disk almost full"
+          description: "Less than 15% disk space remeaning"
