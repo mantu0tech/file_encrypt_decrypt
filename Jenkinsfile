@@ -82,7 +82,7 @@ pipeline {
             docker run --rm \
               -v /var/run/docker.sock:/var/run/docker.sock \
               -v ${WORKSPACE}:/workspace \
-              aquasec/trivy:latest image \
+              aquasecurity/trivy:latest image \
               --exit-code 1 \
               --severity HIGH,CRITICAL \
               --format table \
