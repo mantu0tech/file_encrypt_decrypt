@@ -115,7 +115,6 @@ pipeline {
     stage('Deploy on Server') {
       steps {
         sh """
-          docker build -t my-app .
           echo "Stopping old container if exists..."
           docker stop my-app || true
           docker rm my-app || true
@@ -145,7 +144,6 @@ pipeline {
     always {
       sh """
         docker rmi ${FULL_IMAGE} || true
-        docker rmi ${LATEST_IMAGE} || true
       """
       cleanWs()
     }
