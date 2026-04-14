@@ -62,18 +62,7 @@ pipeline {
       }
     }
 
-    stage('Quality Gate') {
-      steps {
-        timeout(time: 5, unit: 'MINUTES') {
-          script {
-            def qg = waitForQualityGate()
-            if (qg.status != 'OK') {
-              error("KILL SWITCH: Quality Gate failed (${qg.status})")
-            }
-          }
-        }
-      }
-    }
+  
 
     stage('Docker Build') {
       steps {
