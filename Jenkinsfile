@@ -103,11 +103,7 @@ pipeline {
 
             aws ecr describe-repositories \
               --repository-names ${ECR_REPOSITORY} \
-              --region ${AWS_REGION} || \
-            aws ecr create-repository \
-              --repository-name ${ECR_REPOSITORY} \
-              --region ${AWS_REGION}
-
+              --region ${AWS_REGION} || 
             docker push ${FULL_IMAGE}
             docker push ${LATEST_IMAGE}
           """
