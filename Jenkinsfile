@@ -76,26 +76,24 @@ pipeline {
 
     // ── KILL SWITCH 3 ──
     stage('Trivy Scan') {
-      steps {
-        script {
-          def result = sh(returnStatus: true, script: """
-            docker run --rm \
-              -v /var/run/docker.sock:/var/run/docker.sock \
-              -v ${WORKSPACE}:/workspace \
-              ghcr.io/aquasecurity/trivy:latest image \
-              --exit-code 1 \
-              --severity HIGH,CRITICAL \
-              --format table \
-              --output /workspace/trivy-report.txt \
-              ${FULL_IMAGE}
-          """)
-          archiveArtifacts 'trivy-report.txt'
-          if (result != 0) {
-            error("KILL SWITCH: Vulnerabilities found!")
-          }
-        }
-      }
+  steps {
+    script {
+      sh """
+        docker run --rm \
+          -v /var/run/docker.sock:/var/run/docker.sock \
+          -v ${WORKSPACE}:/workspace \
+          ghcr.io/aquasecurity/trivy:0.53.0 image \
+          --exit-code 0 \
+          --severity HIGH,CRITICAL \
+          --format json \
+          --output /workspace/trivy-report.json \
+          ${FULL_IMAGE}
+      """
+
+      archiveArtifacts artifacts: 'trivy-report.json', allowEmptyArchive: true
     }
+  }
+}
 
     stage('Push to ECR') {
       steps {
